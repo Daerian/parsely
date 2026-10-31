@@ -6,6 +6,7 @@ import {
   PiggyBank,
   TrendingUp,
   BarChart3,
+  Settings as SettingsIcon,
 } from 'lucide-react'
 
 const TABS = [
@@ -20,6 +21,19 @@ const TABS = [
 export default function AppShell() {
   return (
     <div className="flex h-dvh flex-col bg-stone-50">
+      <header className="safe-top sticky top-0 z-10 flex items-center justify-between border-b border-stone-200 bg-white/95 px-4 py-2.5 backdrop-blur">
+        <span className="text-sm font-bold text-brand-700">🌿 Parsely</span>
+        <NavLink
+          to="/settings"
+          aria-label="Settings"
+          className={({ isActive }) =>
+            `rounded-full p-1.5 ${isActive ? 'bg-brand-50 text-brand-700' : 'text-stone-400 active:bg-stone-100'}`
+          }
+        >
+          <SettingsIcon size={20} strokeWidth={2} />
+        </NavLink>
+      </header>
+
       <main className="flex-1 overflow-y-auto pb-20">
         <Outlet />
       </main>
