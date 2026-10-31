@@ -1,9 +1,11 @@
-/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { cloudflare } from '@cloudflare/vite-plugin'
 
+// Test config lives in vitest.config.ts — the cloudflare() plugin here
+// starts its own dev server, which collides with Vitest's.
 export default defineConfig({
   plugins: [
     react(),
@@ -25,9 +27,6 @@ export default defineConfig({
         ],
       },
     }),
+    cloudflare(),
   ],
-  test: {
-    environment: 'node',
-    include: ['src/**/*.test.ts'],
-  },
 })

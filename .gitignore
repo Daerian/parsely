@@ -6,4 +6,11 @@ dev-dist/
 *.local
 .DS_Store
 .supabase/
+supabase/.temp/
 *.tsbuildinfo
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
