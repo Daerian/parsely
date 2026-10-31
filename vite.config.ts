@@ -11,7 +11,14 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' + injectRegister: false: we register the service worker
+      // ourselves via the React hook (UpdateToast) so a new version waits
+      // for the user to tap "Refresh" instead of silently hot-swapping
+      // underneath them. Paired with a periodic update check, since relying
+      // on "the next navigation happens to notice" is what caused the
+      // repeated stale-cache confusion while testing this app.
+      registerType: 'prompt',
+      injectRegister: false,
       manifest: {
         name: 'Parsely',
         short_name: 'Parsely',
