@@ -13,6 +13,7 @@ import { currentMonthStart, daysInMonth, formatMoney } from '../lib/format'
 import { dateStringToMonth, monthToDateString, shiftMonth } from '../lib/budgets'
 import Card from '../components/Card'
 import type { RecurringFrequency } from '../lib/database.types'
+import { getErrorMessage } from '../lib/errors'
 
 export default function Forecast() {
   const month = currentMonthStart()
@@ -192,7 +193,7 @@ function RecurringItemModal({ onClose }: { onClose: () => void }) {
       })
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save')
+      setError(getErrorMessage(err, 'Failed to save'))
     }
   }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
+import { getErrorMessage } from '../lib/errors'
 
 export default function Onboarding() {
   const { refreshHousehold, signOut } = useAuth()
@@ -31,7 +32,7 @@ export default function Onboarding() {
       }
       await refreshHousehold()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(getErrorMessage(err, 'Something went wrong'))
     } finally {
       setLoading(false)
     }
