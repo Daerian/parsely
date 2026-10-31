@@ -6,6 +6,7 @@ import { useDeleteDocument, useDocuments } from '../lib/queries'
 import { supabase } from '../lib/supabase'
 import Card from '../components/Card'
 import type { DocumentKind } from '../lib/database.types'
+import { getErrorMessage } from '../lib/errors'
 
 export default function Upload() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ export default function Upload() {
       const { documentId } = await upload.mutateAsync({ file, kind })
       navigate(`/review/${documentId}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed')
+      setError(getErrorMessage(err, 'Upload failed'))
     } finally {
       setPendingKind(null)
     }

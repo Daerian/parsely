@@ -16,6 +16,7 @@ import { findMatch } from '../lib/matching'
 import { matchMerchantRule, toMerchantPattern } from '../lib/merchantRules'
 import { formatMoney } from '../lib/format'
 import type { LineItem } from '../lib/database.types'
+import { getErrorMessage } from '../lib/errors'
 
 interface ParsedTx {
   date: string
@@ -167,7 +168,7 @@ export default function Review() {
       await confirmDocument.mutateAsync(documentId!)
       navigate('/transactions')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save transactions')
+      setError(getErrorMessage(err, 'Failed to save transactions'))
     }
   }
 

@@ -10,6 +10,7 @@ import {
 } from '../lib/queries'
 import { formatMoney } from '../lib/format'
 import Card from '../components/Card'
+import { getErrorMessage } from '../lib/errors'
 
 export default function Transactions() {
   const [search, setSearch] = useState('')
@@ -180,7 +181,7 @@ function TransactionModal({ transaction, onClose, onDelete }: TransactionModalPr
       }
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save')
+      setError(getErrorMessage(err, 'Failed to save'))
     }
   }
 

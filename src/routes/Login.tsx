@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { getErrorMessage } from '../lib/errors'
 
 export default function Login() {
   const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn')
@@ -24,7 +25,7 @@ export default function Login() {
         setInfo('Account created. If email confirmation is enabled on your Supabase project, check your inbox.')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(getErrorMessage(err, 'Something went wrong'))
     } finally {
       setLoading(false)
     }
