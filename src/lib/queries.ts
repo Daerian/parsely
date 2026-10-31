@@ -35,6 +35,26 @@ export function useHouseholdMembers() {
   })
 }
 
+export function useUpdateDisplayName() {
+  const { household, user } = useAuth()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (displayName: string) => {
+      const { data, error } = await supabase
+        .from('household_members')
+        .update({ display_name: displayName })
+        .eq('household_id', household!.id)
+        .eq('user_id', user!.id)
+        .select('user_id')
+      if (error) throw error
+      // RLS failures match zero rows rather than erroring, so an empty result
+      // means the write was rejected, not that it succeeded with no changes.
+      if (!data || data.length === 0) throw new Error('Could not update your name — permission denied.')
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['household-members', household?.id] }),
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Categories
 // ---------------------------------------------------------------------------
