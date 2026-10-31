@@ -5,17 +5,23 @@ brand-green field, matching the 🌿 used throughout the app's own UI.
 Draws everything at 4x scale and downsamples with LANCZOS for clean
 anti-aliased edges, since PIL's primitive drawing has none on its own.
 
-Outputs (all in public/icons/):
-  icon-512.png            full-bleed, for the manifest's "any" purpose
-  icon-192.png            same mark, smaller
-  icon-512-maskable.png   mark inset to the ~80% safe zone, for Android's
-                          "maskable" purpose (OS may crop to a circle/squircle)
-  apple-touch-icon.png    180x180, iOS home screen
-  favicon-32.png          browser tab
+Outputs:
+  public/favicon.ico                root-level, multi-size — browsers probe
+                                     this by default regardless of <link> tags
+  public/icons/sprout-32.png        modern PNG favicon (sharper on high-DPI
+                                     tab bars than the .ico); deliberately a
+                                     filename never used before, since
+                                     browsers cache favicons stubbornly per
+                                     URL and reusing an old path can keep
+                                     showing the old bytes indefinitely
+  public/icons/icon-192.png         PWA manifest icon
+  public/icons/icon-512.png         PWA manifest icon, full-bleed
+  public/icons/icon-512-maskable.png  inset to the ~80% safe zone for
+                                       Android's "maskable" purpose
+  public/icons/apple-touch-icon.png   180x180, iOS home screen
 """
 
 from PIL import Image, ImageDraw
-import math
 import os
 
 SCALE = 4
@@ -24,8 +30,9 @@ BASE = 512 * SCALE
 BG = (21, 128, 61, 255)       # brand-700, same deep green used across the app
 MARK = (240, 253, 244, 255)   # brand-50, near-white with a warm green cast
 
-OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "public", "icons")
-os.makedirs(OUT_DIR, exist_ok=True)
+PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "..", "public")
+ICONS_DIR = os.path.join(PUBLIC_DIR, "icons")
+os.makedirs(ICONS_DIR, exist_ok=True)
 
 
 def lerp(a, b, t):
@@ -89,7 +96,7 @@ def build_sprout(canvas_size, scale_factor=1.0, offset=(0, 0)):
     return layer
 
 
-def render(path, size, maskable=False):
+def composite(size, maskable=False):
     canvas = Image.new("RGBA", (BASE, BASE), BG)
     if maskable:
         # Android may crop up to the edge in a circle/squircle; keep the
@@ -98,13 +105,25 @@ def render(path, size, maskable=False):
     else:
         mark = build_sprout(BASE, scale_factor=0.86, offset=(0, 0))
     canvas.alpha_composite(mark)
-    final = canvas.resize((size, size), Image.LANCZOS)
-    final.save(path)
+    return canvas.resize((size, size), Image.LANCZOS)
+
+
+def render_png(path, size, maskable=False):
+    composite(size, maskable=maskable).save(path)
     print(f"wrote {path} ({size}x{size})")
 
 
-render(os.path.join(OUT_DIR, "icon-512.png"), 512)
-render(os.path.join(OUT_DIR, "icon-192.png"), 192)
-render(os.path.join(OUT_DIR, "icon-512-maskable.png"), 512, maskable=True)
-render(os.path.join(OUT_DIR, "apple-touch-icon.png"), 180)
-render(os.path.join(OUT_DIR, "favicon-32.png"), 32)
+def render_ico(path, sizes):
+    # A real multi-resolution .ico, not a PNG wearing an .ico extension —
+    # browsers that fetch /favicon.ico directly expect the actual format.
+    largest = max(sizes)
+    composite(largest).save(path, format="ICO", sizes=[(s, s) for s in sizes])
+    print(f"wrote {path} ({'/'.join(str(s) for s in sizes)})")
+
+
+render_ico(os.path.join(PUBLIC_DIR, "favicon.ico"), [16, 32, 48])
+render_png(os.path.join(ICONS_DIR, "sprout-32.png"), 32)
+render_png(os.path.join(ICONS_DIR, "icon-192.png"), 192)
+render_png(os.path.join(ICONS_DIR, "icon-512.png"), 512)
+render_png(os.path.join(ICONS_DIR, "icon-512-maskable.png"), 512, maskable=True)
+render_png(os.path.join(ICONS_DIR, "apple-touch-icon.png"), 180)
